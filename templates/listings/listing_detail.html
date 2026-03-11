@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ prop.title }} — HouseSquare{% endblock %}
+{% block meta_desc %}{{ prop.description|truncatechars:160 }}{% endblock %}
+
+{% block content %}
+
+<div class="detail-layout">
+  <!-- ─── LEFT COLUMN ─── -->
+  <div class="detail-main">
+
+    <!-- Image Gallery -->
+    <div class="gallery">
+      <div class="gallery-main">
+        {% if prop.cover_image %}
+          <img src="{{ prop.cover_image.url }}" alt="{{ prop.title }}" id="mainImg">
+        {% else %}
+          <img src="{% static 'assets/images/placeholder.svg' %}" alt="{{ prop.title }}" id="mainImg">
+        {% endif %}
+        <span class="gallery-type-badge">{{ prop.get_property_type_display }}</span>
+        {% if prop.is_verified %}<span class="gallery-verified">✓ Verified</span>{% endif %}
+      </div>
+      {% if images %}
+      <div class="gallery-thumbs">
+        {% if prop.cover_image %}
+          <img src="{{ prop.cover_image.url }}" alt="main" class="thumb active" onclick="swapImg(this)">
+        {% endif %}
+        {% for img in images %}
+          <img src="{{ img.image.url }}" alt="{{ img.caption }}" class="thumb" onclick="swapImg(this)">
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Header -->
+    <div class="detail-header">
+      <div>
+        <div class="detail-address">📍 {{ prop.address }}{% if prop.city %}, {{ prop.city }}{% endif %}</div>
+        <h1 class="detail-title">{{ prop.title }}</h1>
+      </div>
+      <div class="detail-price-block">
+        <div class="detail-price">{{ prop.formatted_price }}</div>
+        {% if prop.purpose == 'rent' %}<div class="detail-price-note">per month</div>{% endif %}
+        {% if prop.price_negotiable %}<div class="price-tag-neg">Negotiable</div>{% endif %}
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="detail-stats-bar">
+      {% if prop.bedrooms %}<div class="ds-item"><span>🛏</span><strong>{{ prop.bedrooms }}</strong><span>Bedrooms</span></div>{% endif %}
+      {% if prop.bathrooms %}<div class="ds-item"><span>🛁</span><strong>{{ prop.bathrooms }}</strong><span>Bathrooms</span></div>{% endif %}
+      {% if prop.built_up_area %}<div class="ds-item"><span>📐</span><strong>{{ prop.built_up_area|floatformat:0 }}</strong><span>sqft</span></div>{% endif %}
+      {% if prop.floor_number %}<div class="ds-item"><span>🏢</span><strong>{{ prop.floor_number }}/{{ prop.total_floors }}</strong><span>Floor</span></div>{% endif %}
+      {% if prop.parking_spots %}<div class="ds-item"><span>🚗</span><strong>{{ prop.parking_spots }}</strong><span>Parking</span></div>{% endif %}
+    </div>
+
+    <!-- Description -->
+    <div class="detail-section">
+      <h2 class="ds-title">About This Property</h2>
+      <p class="detail-desc">{{ prop.description|linebreaks }}</p>
+    </div>
+
+    <!-- Property Details Table -->
+    <div class="detail-section">
+      <h2 class="ds-title">Property Details</h2>
+      <div class="detail-table">
+        <div class="dt-row"><span>Type</span><strong>{{ prop.get_property_type_display }}</strong></div>
+        <div class="dt-row"><span>Purpose</span><strong>{{ prop.get_purpose_display }}</strong></div>
+        <div class="dt-row"><span>Status</span><strong>{{ prop.get_status_display }}</strong></div>
+        {% if prop.furnishing %}<div class="dt-row"><span>Furnishing</span><strong>{{ prop.get_furnishing_display }}</strong></div>{% endif %}
+        {% if prop.facing %}<div class="dt-row"><span>Facing</span><strong>{{ prop.get_facing_display }}</strong></div>{% endif %}
+        {% if prop.age_of_property %}<div class="dt-row"><span>Age</span><strong>{{ prop.age_of_property }} year{{ prop.age_of_property|pluralize }}</strong></div>{% endif %}
+        {% if prop.carpet_area %}<div class="dt-row"><span>Carpet Area</span><strong>{{ prop.carpet_area|floatformat:0 }} sqft</strong></div>{% endif %}
+        {% if prop.balconies %}<div class="dt-row"><span>Balconies</span><strong>{{ prop.balconies }}</strong></div>{% endif %}
+        {% if prop.maintenance_charges %}<div class="dt-row"><span>Maintenance</span><strong>₹{{ prop.maintenance_charges|floatformat:0 }}/mo</strong></div>{% endif %}
+        <div class="dt-row"><span>Views</span><strong>{{ prop.views_count }}</strong></div>
+        <div class="dt-row"><span>Listed On</span><strong>{{ prop.created_at|date:"d M Y" }}</strong></div>
+      </div>
+    </div>
+
+    <!-- Amenities -->
+    {% if prop.amenities_list %}
+    <div class="detail-section">
+      <h2 class="ds-title">Amenities</h2>
+      <div class="amenities-grid">
+        {% for icon, label in prop.amenities_list %}
+        <div class="amenity-item"><span>{{ icon }}</span> {{ label }}</div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- ─── RIGHT COLUMN ─── -->
+  <aside class="detail-sidebar">
+
+    <!-- Contact / Inquiry Card -->
+    <div class="inquiry-card">
+      <h3>Interested in this property?</h3>
+      <p>Get in touch with the owner or agent for a site visit.</p>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        {% for field in inquiry_form %}
+        <div class="form-group">
+          <label>{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<div class="field-error">{{ field.errors.0 }}</div>{% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="submit-btn">Send Inquiry →</button>
+      </form>
+
+      {% if prop.owner_phone %}
+      <a href="tel:{{ prop.owner_phone }}" class="call-btn">📞 Call Now: {{ prop.owner_phone }}</a>
+      {% endif %}
+    </div>
+
+    <!-- Agent Card -->
+    {% if prop.agent %}
+    <div class="agent-sidebar-card">
+      <div class="agent-photo-sm">
+        {% if prop.agent.photo %}
+          <img src="{{ prop.agent.photo.url }}" alt="{{ prop.agent.name }}">
+        {% else %}
+          <div class="agent-initials-sm">{{ prop.agent.name|first }}</div>
+        {% endif %}
+        {% if prop.agent.verified %}<span class="verified-sm">✓</span>{% endif %}
+      </div>
+      <div>
+        <div class="agent-nm">{{ prop.agent.name }}</div>
+        <div class="agent-ph">{{ prop.agent.phone }}</div>
+        <a href="{% url 'listings:agent_detail' prop.agent.pk %}" class="agent-link">View Profile →</a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Share -->
+    <div class="share-card">
+      <h4>Share this property</h4>
+      <div class="share-btns">
+        <button onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied!')" class="share-btn">🔗 Copy Link</button>
+        <a href="https://wa.me/?text={{ request.build_absolute_uri }}" target="_blank" class="share-btn whatsapp">💬 WhatsApp</a>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- Similar Properties -->
+{% if similar %}
+<section class="section" style="padding-top: 0">
+  <div class="section-header">
+    <div>
+      <div class="section-tag">Similar Listings</div>
+      <h2 class="section-title">You May <em>Also Like</em></h2>
+    </div>
+  </div>
+  <div class="listings-grid">
+    {% for s in similar %}
+    <div class="listing-card">
+      <a href="{{ s.get_absolute_url }}" class="card-link">
+        <div class="card-img">
+          {% if s.cover_image %}<img src="{{ s.cover_image.url }}" alt="{{ s.title }}" loading="lazy">
+          {% else %}<img src="{% static 'assets/images/placeholder.svg' %}" alt="{{ s.title }}" loading="lazy">{% endif %}
+          <span class="card-type-badge">{{ s.get_property_type_display }}</span>
+        </div>
+        <div class="card-body">
+          <div class="card-address">📍 {{ s.locality }}</div>
+          <div class="card-title">{{ s.title }}</div>
+          <div class="card-footer">
+            <div class="card-price-tag">{{ s.formatted_price }}</div>
+            <span class="card-btn">View →</span>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function swapImg(el) {
+  document.getElementById('mainImg').src = el.src;
+  document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+{% endblock %}

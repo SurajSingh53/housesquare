@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Our Agents — HouseSquare{% endblock %}
+{% block content %}
+
+<div class="page-hero-small">
+  <div>
+    <div class="section-tag">Meet the Team</div>
+    <h1 class="page-title">Our <em>Verified</em> Agents</h1>
+    <p class="page-sub">Experienced professionals committed to finding your perfect property</p>
+  </div>
+</div>
+
+<section class="section">
+  {% if agents %}
+  <div class="agents-full-grid">
+    {% for agent in agents %}
+    <a href="{% url 'listings:agent_detail' agent.pk %}" class="agent-full-card">
+      <div class="agent-photo-lg">
+        {% if agent.photo %}<img src="{{ agent.photo.url }}" alt="{{ agent.name }}">
+        {% else %}<div class="agent-initials-lg">{{ agent.name|first }}</div>{% endif %}
+        {% if agent.verified %}<span class="verified-badge-lg">✓ Verified</span>{% endif %}
+      </div>
+      <div class="agent-info">
+        <h3>{{ agent.name }}</h3>
+        <p class="agent-bio">{{ agent.bio|truncatechars:120 }}</p>
+        <div class="agent-meta">
+          <span>📱 {{ agent.phone }}</span>
+          <span>🏠 {{ agent.listings_count }} listings</span>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="no-results">
+    <div class="no-results-icon">👥</div>
+    <h3>No agents listed yet.</h3>
+    <p>Check back soon.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

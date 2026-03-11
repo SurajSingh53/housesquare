@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Browse Properties — HouseSquare{% endblock %}
+
+{% block content %}
+
+<div class="page-hero-small">
+  <div>
+    <div class="section-tag">Properties</div>
+    <h1 class="page-title">Find Your <em>Dream Home</em></h1>
+    <p class="page-sub">{{ total }} propert{{ total|pluralize:"y,ies" }} available</p>
+  </div>
+</div>
+
+<div class="list-layout">
+
+  <!-- SIDEBAR FILTERS -->
+  <aside class="filter-sidebar">
+    <div class="sidebar-header">
+      <h3>Filter</h3>
+      <a href="{% url 'listings:list' %}" class="clear-filters">Clear All</a>
+    </div>
+
+    <form method="get" action="{% url 'listings:list' %}" id="filterForm">
+      <div class="filter-group">
+        <label>Search</label>
+        <input type="text" name="q" value="{{ form.q.value|default:'' }}" placeholder="City, locality…" class="filter-input">
+      </div>
+
+      <div class="filter-group">
+        <label>Purpose</label>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="purpose" value="" {% if not form.purpose.value %}checked{% endif %}> Any</label>
+          <label class="radio-opt"><input type="radio" name="purpose" value="sale" {% if form.purpose.value == 'sale' %}checked{% endif %}> Buy</label>
+          <label class="radio-opt"><input type="radio" name="purpose" value="rent" {% if form.purpose.value == 'rent' %}checked{% endif %}> Rent</label>
+          <label class="radio-opt"><input type="radio" name="purpose" value="lease" {% if form.purpose.value == 'lease' %}checked{% endif %}> Lease</label>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Property Type</label>
+        <select name="property_type" class="filter-select" onchange="this.form.submit()">
+          <option value="">All Types</option>
+          <option value="apartment" {% if form.property_type.value == 'apartment' %}selected{% endif %}>Apartment</option>
+          <option value="villa"     {% if form.property_type.value == 'villa' %}selected{% endif %}>Villa</option>
+          <option value="plot"      {% if form.property_type.value == 'plot' %}selected{% endif %}>Plot / Land</option>
+          <option value="penthouse" {% if form.property_type.value == 'penthouse' %}selected{% endif %}>Penthouse</option>
+          <option value="commercial"{% if form.property_type.value == 'commercial' %}selected{% endif %}>Commercial</option>
+          <option value="office"    {% if form.property_type.value == 'office' %}selected{% endif %}>Office</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Bedrooms</label>
+        <div class="bhk-options">
+          {% for val, label in form.fields.bedrooms.choices %}
+          <label class="bhk-opt {% if form.bedrooms.value == val %}active{% endif %}">
+            <input type="radio" name="bedrooms" value="{{ val }}" {% if form.bedrooms.value == val %}checked{% endif %}>
+            {{ label }}
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Min Price (₹)</label>
+        <input type="number" name="min_price" value="{{ form.min_price.value|default:'' }}" placeholder="e.g. 2000000" class="filter-input">
+      </div>
+
+      <div class="filter-group">
+        <label>Max Price (₹)</label>
+        <input type="number" name="max_price" value="{{ form.max_price.value|default:'' }}" placeholder="e.g. 10000000" class="filter-input">
+      </div>
+
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select name="sort" class="filter-select">
+          <option value="-created_at" {% if form.sort.value == '-created_at' %}selected{% endif %}>Newest First</option>
+          <option value="price"       {% if form.sort.value == 'price' %}selected{% endif %}>Price: Low → High</option>
+          <option value="-price"      {% if form.sort.value == '-price' %}selected{% endif %}>Price: High → Low</option>
+          <option value="-views_count"{% if form.sort.value == '-views_count' %}selected{% endif %}>Most Viewed</option>
+        </select>
+      </div>
+
+      <button type="submit" class="filter-apply-btn">Apply Filters</button>
+    </form>
+  </aside>
+
+  <!-- MAIN GRID -->
+  <div class="list-main">
+    {% if page_obj.object_list %}
+      <div class="listings-grid">
+        {% for prop in page_obj %}
+        <div class="listing-card">
+          <a href="{{ prop.get_absolute_url }}" class="card-link">
+            <div class="card-img">
+              {% if prop.cover_image %}
+                <img src="{{ prop.cover_image.url }}" alt="{{ prop.title }}" loading="lazy">
+              {% else %}
+                <img src="{% static 'assets/images/placeholder.svg' %}" alt="{{ prop.title }}" loading="lazy">
+              {% endif %}
+              <span class="card-type-badge">{{ prop.get_property_type_display }}</span>
+              {% if prop.is_featured %}<span class="card-featured-badge">⭐ Featured</span>{% endif %}
+            </div>
+            <div class="card-body">
+              <div class="card-address">📍 {{ prop.locality }}{% if prop.city %}, {{ prop.city.name }}{% endif %}</div>
+              <div class="card-title">{{ prop.title }}</div>
+              <div class="card-features">
+                {% if prop.bedrooms %}<span class="feat">🛏 {{ prop.bedrooms }} Bed</span>{% endif %}
+                {% if prop.bathrooms %}<span class="feat">🛁 {{ prop.bathrooms }} Bath</span>{% endif %}
+                {% if prop.built_up_area %}<span class="feat">📐 {{ prop.built_up_area|floatformat:0 }} sqft</span>{% endif %}
+              </div>
+              <div class="card-footer">
+                <div class="card-price-tag">{{ prop.formatted_price }}</div>
+                <span class="card-btn">View →</span>
+              </div>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- PAGINATION -->
+      {% if page_obj.has_other_pages %}
+      <div class="pagination">
+        {% if page_obj.has_previous %}
+          <a href="?{% for k,v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" class="page-btn">← Prev</a>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <span class="page-btn active">{{ num }}</span>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?{% for k,v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}page={{ num }}" class="page-btn">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <a href="?{% for k,v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" class="page-btn">Next →</a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+    {% else %}
+      <div class="no-results">
+        <div class="no-results-icon">🔍</div>
+        <h3>No Properties Found</h3>
+        <p>Try adjusting your filters or search terms.</p>
+        <a href="{% url 'listings:list' %}" class="btn-primary">Clear Filters</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

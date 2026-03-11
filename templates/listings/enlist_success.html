@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Listing Submitted — HouseSquare{% endblock %}
+{% block content %}
+<div style="min-height:60vh; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:80px 40px;">
+  <div style="font-size:72px; margin-bottom:24px;">🏡</div>
+  <h1 style="font-family:'Playfair Display',serif; font-size:42px; font-weight:900; margin-bottom:16px;">Listing Submitted!</h1>
+  <p style="font-size:16px; color:var(--warm-gray); max-width:480px; line-height:1.8; margin-bottom:36px;">
+    Thank you for trusting HouseSquare. Our team will review your property and reach out within <strong>24 hours</strong> to complete the listing process.
+  </p>
+  <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+    <a href="{% url 'listings:home' %}" class="btn-primary">Back to Home</a>
+    <a href="{% url 'listings:list' %}" style="padding:12px 24px; border:1.5px solid var(--charcoal); border-radius:6px; text-decoration:none; font-size:14px; color:var(--charcoal);">Browse Properties</a>
+  </div>
+</div>
+{% endblock %}

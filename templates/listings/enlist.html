@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}List Your Property — HouseSquare{% endblock %}
+
+{% block content %}
+
+<div class="enlist-section">
+  <div class="enlist-left">
+    <div class="section-tag" style="color:var(--gold)">For Property Owners</div>
+    <h2 class="section-title" style="color:white">List Your<br>Property,<br><em style="color:var(--gold)">Reach Millions.</em></h2>
+    <p class="enlist-desc">Join thousands of owners and developers who trust HouseSquare to connect them with genuine buyers and renters.</p>
+    <div class="enlist-benefits">
+      <div class="benefit"><div class="benefit-dot"></div>Free listing for first 30 days</div>
+      <div class="benefit"><div class="benefit-dot"></div>Verified buyer inquiries only</div>
+      <div class="benefit"><div class="benefit-dot"></div>HD photos &amp; virtual tour support</div>
+      <div class="benefit"><div class="benefit-dot"></div>Real-time analytics dashboard</div>
+      <div class="benefit"><div class="benefit-dot"></div>Dedicated relationship manager</div>
+    </div>
+    <div class="enlist-stats">
+      <div><strong>12K+</strong><span>Active Listings</span></div>
+      <div><strong>4.8K</strong><span>Verified Sellers</span></div>
+      <div><strong>98%</strong><span>Response Rate</span></div>
+    </div>
+  </div>
+
+  <div class="enlist-form-card">
+    <div class="form-title">Enlist Your Property</div>
+    <p style="font-size:13px;color:var(--warm-gray);margin-bottom:28px;">Fill in the details below and our team will review your listing within 24 hours.</p>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-bottom:20px;">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{ form.owner_name.label }}</label>
+          {{ form.owner_name }}
+          {% if form.owner_name.errors %}<div class="field-error">{{ form.owner_name.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group">
+          <label>{{ form.owner_phone.label }}</label>
+          {{ form.owner_phone }}
+          {% if form.owner_phone.errors %}<div class="field-error">{{ form.owner_phone.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="grid-column:1/-1">
+          <label>{{ form.owner_email.label }}</label>
+          {{ form.owner_email }}
+          {% if form.owner_email.errors %}<div class="field-error">{{ form.owner_email.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{ form.property_type.label }}</label>
+          {{ form.property_type }}
+        </div>
+        <div class="form-group">
+          <label>{{ form.purpose.label }}</label>
+          {{ form.purpose }}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{ form.city.label }}</label>
+          {{ form.city }}
+        </div>
+        <div class="form-group">
+          <label>{{ form.locality.label }}</label>
+          {{ form.locality }}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{ form.price.label }}</label>
+          {{ form.price }}
+          {% if form.price.errors %}<div class="field-error">{{ form.price.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group">
+          <label>{{ form.built_up_area.label }}</label>
+          {{ form.built_up_area }}
+          {% if form.built_up_area.errors %}<div class="field-error">{{ form.built_up_area.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="grid-column:1/-1">
+          <label>{{ form.bedrooms.label }}</label>
+          {{ form.bedrooms }}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="grid-column:1/-1">
+          <label>{{ form.description.label }}</label>
+          {{ form.description }}
+          {% if form.description.errors %}<div class="field-error">{{ form.description.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn">Submit Listing →</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

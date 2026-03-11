@@ -1,0 +1,23 @@
+{% load static %}
+<nav class="navbar" id="navbar">
+  <a href="{% url 'listings:home' %}" class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="white"><path d="M3 12L12 3l9 9v9H3V12zm2 1v7h6v-5h2v5h6v-7L12 5.5 5 13z"/></svg>
+    </div>
+    House<span>Square</span>
+  </a>
+
+  <ul class="nav-links" id="navLinks">
+    <li><a href="{% url 'listings:list' %}?purpose=sale">Buy</a></li>
+    <li><a href="{% url 'listings:list' %}?purpose=rent">Rent</a></li>
+    <li><a href="{% url 'listings:list' %}?property_type=commercial">Commercial</a></li>
+    <li><a href="{% url 'listings:agents' %}">Agents</a></li>
+  </ul>
+
+  <div class="nav-actions">
+    <a href="{% url 'listings:enlist' %}" class="nav-cta">List Property →</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>

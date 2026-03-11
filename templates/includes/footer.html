@@ -1,0 +1,55 @@
+{% load static %}
+<footer class="footer">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="footer-logo">House<span>Square</span></div>
+      <p class="footer-desc">India's most trusted platform to buy, sell &amp; rent residential and commercial properties.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="Instagram">📸</a>
+        <a href="#" aria-label="Twitter">🐦</a>
+        <a href="#" aria-label="LinkedIn">💼</a>
+        <a href="#" aria-label="YouTube">▶️</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="{% url 'listings:list' %}?purpose=sale">Buy Property</a></li>
+        <li><a href="{% url 'listings:list' %}?purpose=rent">Rent Property</a></li>
+        <li><a href="{% url 'listings:list' %}?property_type=commercial">Commercial</a></li>
+        <li><a href="{% url 'listings:list' %}?property_type=plot">Plots / Land</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Owners</h4>
+      <ul>
+        <li><a href="{% url 'listings:enlist' %}">List Your Property</a></li>
+        <li><a href="{% url 'listings:agents' %}">Find an Agent</a></li>
+        <li><a href="#">Pricing Plans</a></li>
+        <li><a href="#">Property Valuation</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Press</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="#">Help Center</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Sitemap</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 HouseSquare. All rights reserved.</div>
+    <div class="footer-mark">Made with <span>♥</span> for homeowners everywhere</div>
+  </div>
+</footer>

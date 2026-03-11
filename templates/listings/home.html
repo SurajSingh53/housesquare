@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-left animate-up">
+    <div class="hero-tag">Premium Real Estate Platform</div>
+    <h1 class="hero-title">Find Your<br><em>Perfect</em><br>Address.</h1>
+    <p class="hero-sub">Discover curated homes, villas &amp; commercial spaces. HouseSquare connects you with verified listings across the country.</p>
+
+    <form class="search-box" action="{% url 'listings:list' %}" method="get">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0A898" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" name="q" placeholder="Search city, locality, or project name…" value="{{ request.GET.q }}">
+      <button type="submit" class="search-btn">Search</button>
+    </form>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">{{ total_count|default:"0" }}+</div>
+        <div class="stat-label">Active Listings</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">4.8K</div>
+        <div class="stat-label">Verified Sellers</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">98%</div>
+        <div class="stat-label">Happy Buyers</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-photo" style="background-image: url('{% static 'assets/images/hero-house.jpg' %}')"></div>
+    <div class="floating-card">
+      <span class="card-badge">NEW</span>
+      <div class="card-label">Starting From</div>
+      <div class="card-price">₹2.4 Cr</div>
+      <div class="card-loc">📍 Whitefield, Bengaluru</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FILTER BAR ═══ -->
+<div class="filter-bar">
+  <form class="filter-form" action="{% url 'listings:list' %}" method="get">
+    <div class="filter-item">
+      <label>Looking For</label>
+      <select name="purpose">
+        <option value="">Buy / Rent</option>
+        <option value="sale">Buy Property</option>
+        <option value="rent">Rent Property</option>
+        <option value="lease">Commercial Lease</option>
+      </select>
+    </div>
+    <div class="filter-item">
+      <label>Property Type</label>
+      <select name="property_type">
+        <option value="">All Types</option>
+        <option value="apartment">Apartment</option>
+        <option value="villa">Villa</option>
+        <option value="plot">Plot / Land</option>
+        <option value="penthouse">Penthouse</option>
+        <option value="commercial">Commercial</option>
+      </select>
+    </div>
+    <div class="filter-item">
+      <label>Budget</label>
+      <select name="max_price">
+        <option value="">Any Budget</option>
+        <option value="5000000">Under ₹50L</option>
+        <option value="10000000">Under ₹1 Cr</option>
+        <option value="30000000">Under ₹3 Cr</option>
+        <option value="50000000">Under ₹5 Cr</option>
+      </select>
+    </div>
+    <div class="filter-item">
+      <label>Bedrooms</label>
+      <select name="bedrooms">
+        <option value="">Any BHK</option>
+        <option value="1">1 BHK</option>
+        <option value="2">2 BHK</option>
+        <option value="3">3 BHK</option>
+        <option value="4">4 BHK</option>
+        <option value="5">5+ BHK</option>
+      </select>
+    </div>
+    <button type="submit" class="filter-search-btn">Search Properties</button>
+  </form>
+</div>
+
+<!-- ═══ FEATURED LISTINGS ═══ -->
+{% if featured %}
+<section class="section">
+  <div class="section-header">
+    <div>
+      <div class="section-tag">Featured Properties</div>
+      <h2 class="section-title">Handpicked <em>Homes</em><br>Just For You</h2>
+    </div>
+    <a href="{% url 'listings:list' %}" class="view-all">View All Listings →</a>
+  </div>
+
+  <div class="listings-grid">
+    {% for prop in featured %}
+    <div class="listing-card" style="animation-delay: {{ forloop.counter0 }}00ms">
+      <a href="{{ prop.get_absolute_url }}" class="card-link">
+        <div class="card-img">
+          {% if prop.cover_image %}
+            <img src="{{ prop.cover_image.url }}" alt="{{ prop.title }}" loading="lazy">
+          {% else %}
+            <img src="{% static 'assets/images/properties/placeholder-'|add:forloop.counter|stringformat:'s'|add:'.jpg' %}" alt="{{ prop.title }}" loading="lazy" onerror="this.src='{% static 'assets/images/placeholder.svg' %}'">
+          {% endif %}
+          <span class="card-type-badge">{{ prop.get_property_type_display }}</span>
+          <div class="card-fav" data-id="{{ prop.pk }}">♡</div>
+        </div>
+        <div class="card-body">
+          <div class="card-address">📍 {{ prop.locality }}{% if prop.city %}, {{ prop.city.name }}{% endif %}</div>
+          <div class="card-title">{{ prop.title }}</div>
+          <div class="card-features">
+            {% if prop.bedrooms %}<span class="feat">🛏 {{ prop.bedrooms }} Beds</span>{% endif %}
+            {% if prop.bathrooms %}<span class="feat">🛁 {{ prop.bathrooms }} Baths</span>{% endif %}
+            {% if prop.built_up_area %}<span class="feat">📐 {{ prop.built_up_area|floatformat:0 }} sqft</span>{% endif %}
+          </div>
+          <div class="card-footer">
+            <div class="card-price-tag">{{ prop.formatted_price }}</div>
+            <span class="card-btn">View Details</span>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section class="how-section">
+  <div class="section-header">
+    <div>
+      <div class="section-tag">Simple Process</div>
+      <h2 class="section-title">How <em>HouseSquare</em><br>Works</h2>
+    </div>
+  </div>
+  <div class="steps-grid">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Search &amp; Filter</h3>
+      <p>Browse thousands of verified listings with powerful filters for location, budget, type, and amenities.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>Schedule Visit</h3>
+      <p>Book a site visit directly through our platform at a time that suits your schedule.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>Connect with Agent</h3>
+      <p>Our verified agents guide you through every step — no hidden commissions, no surprises.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <h3>Close the Deal</h3>
+      <p>Complete your paperwork with full assistance and move into your dream home.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ LATEST LISTINGS ═══ -->
+{% if latest %}
+<section class="section">
+  <div class="section-header">
+    <div>
+      <div class="section-tag">Just Added</div>
+      <h2 class="section-title">Fresh <em>New</em><br>Listings</h2>
+    </div>
+    <a href="{% url 'listings:list' %}?sort=-created_at" class="view-all">See All New →</a>
+  </div>
+
+  <div class="listings-grid">
+    {% for prop in latest %}
+    <div class="listing-card">
+      <a href="{{ prop.get_absolute_url }}" class="card-link">
+        <div class="card-img">
+          {% if prop.cover_image %}
+            <img src="{{ prop.cover_image.url }}" alt="{{ prop.title }}" loading="lazy">
+          {% else %}
+            <img src="{% static 'assets/images/placeholder.svg' %}" alt="{{ prop.title }}" loading="lazy">
+          {% endif %}
+          <span class="card-type-badge">{{ prop.get_property_type_display }}</span>
+          <span class="card-new-badge">New</span>
+        </div>
+        <div class="card-body">
+          <div class="card-address">📍 {{ prop.locality }}{% if prop.city %}, {{ prop.city.name }}{% endif %}</div>
+          <div class="card-title">{{ prop.title }}</div>
+          <div class="card-features">
+            {% if prop.bedrooms %}<span class="feat">🛏 {{ prop.bedrooms }} Beds</span>{% endif %}
+            {% if prop.bathrooms %}<span class="feat">🛁 {{ prop.bathrooms }} Baths</span>{% endif %}
+            {% if prop.built_up_area %}<span class="feat">📐 {{ prop.built_up_area|floatformat:0 }} sqft</span>{% endif %}
+          </div>
+          <div class="card-footer">
+            <div class="card-price-tag">{{ prop.formatted_price }}</div>
+            <span class="card-btn">View Details</span>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ═══ ENLIST CTA ═══ -->
+<section class="enlist-cta-section">
+  <div class="enlist-cta-content">
+    <div class="section-tag" style="color: var(--gold)">For Property Owners</div>
+    <h2 class="section-title" style="color: white">Own a Property?<br><em style="color:var(--gold)">List it today.</em></h2>
+    <p style="color: rgba(255,255,255,0.65); margin-top:16px; max-width:480px; line-height:1.8;">
+      Join thousands of owners and developers who trust HouseSquare to connect them with genuine buyers and renters. Free listing for 30 days.
+    </p>
+    <div class="enlist-cta-btns">
+      <a href="{% url 'listings:enlist' %}" class="btn-primary">List Your Property →</a>
+      <a href="{% url 'listings:agents' %}" class="btn-outline-light">Find an Agent</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ AGENTS ═══ -->
+{% if agents %}
+<section class="section">
+  <div class="section-header">
+    <div>
+      <div class="section-tag">Verified Agents</div>
+      <h2 class="section-title">Our <em>Expert</em><br>Agents</h2>
+    </div>
+    <a href="{% url 'listings:agents' %}" class="view-all">All Agents →</a>
+  </div>
+  <div class="agents-grid">
+    {% for agent in agents %}
+    <a href="{% url 'listings:agent_detail' agent.pk %}" class="agent-card">
+      <div class="agent-photo">
+        {% if agent.photo %}
+          <img src="{{ agent.photo.url }}" alt="{{ agent.name }}">
+        {% else %}
+          <div class="agent-initials">{{ agent.name|first }}</div>
+        {% endif %}
+        {% if agent.verified %}<span class="verified-badge">✓</span>{% endif %}
+      </div>
+      <div class="agent-name">{{ agent.name }}</div>
+      <div class="agent-count">{{ agent.listings_count }} listings</div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}
