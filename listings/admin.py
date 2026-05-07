@@ -136,9 +136,49 @@ class PropertyEnlistRequestAdmin(admin.ModelAdmin):
     actions = ['mark_approved', 'mark_rejected']
 
     def mark_approved(self, request, queryset):
-        queryset.update(status='approved', reviewed_at=timezone.now())
-        self.message_user(request, f"{queryset.count()} requests approved.")
-    mark_approved.short_description = "✅ Approve selected requests"
+
+    approved_count = 0
+
+    for enlist in queryset:
+
+        # Skip already approved
+        if enlist.status == 'approved':
+            continue
+
+        # Create Property from enlist request
+        property_obj = Property.objects.create(
+            title=f"{enlist.property_type} in {enlist.locality}",
+            slug=f"{enlist.property_type}-{enlist.locality}-{enlist.id}".lower().replace(" ", "-"),
+            description=enlist.description,
+            property_type=enlist.property_type,
+            purpose=enlist.purpose,
+            city=enlist.city,
+            locality=enlist.locality,
+            address=enlist.locality,
+            price=enlist.price,
+            built_up_area=enlist.built_up_area,
+            bedrooms=enlist.bedrooms,
+            owner_name=enlist.owner_name,
+            owner_phone=enlist.owner_phone,
+            owner_email=enlist.owner_email,
+            status='available',
+            is_verified=True,
+            is_featured=False,
+        )
+
+        # Copy image if exists
+        if hasattr(enlist, 'cover_image') and enlist.cover_image:
+            property_obj.cover_image = enlist.cover_image
+            property_obj.save()
+
+        # Mark request approved
+        enlist.status = 'approved'
+        enlist.reviewed_at = timezone.now()
+        enlist.save()
+
+        approved_count += 1
+
+    self.message_user(request, f"{approved_count} requests approved and published.")
 
     def mark_rejected(self, request, queryset):
         queryset.update(status='rejected', reviewed_at=timezone.now())
