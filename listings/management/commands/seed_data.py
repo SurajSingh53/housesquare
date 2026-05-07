@@ -15,6 +15,7 @@ CITIES = [
     ("Delhi",     "Delhi"),
     ("Gurugram",  "Haryana"),
     ("Kolkata",   "West Bengal"),
+    ("Agra",   "Uttar Pradesh"),
 ]
 
 AGENTS = [
